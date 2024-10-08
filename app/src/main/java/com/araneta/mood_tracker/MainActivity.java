@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             requestBody.put("text", text);
             requestBody.put("to", "en"); // Set target language to English
-            requestBody.put("from_lang", "ceb"); // or "tl", assuming input is always in Cebuano or Tagalog
+            requestBody.put("from_lang", "auto");
         } catch (Exception e) {
             Log.e(TAG, "Error creating JSON body: " + e.getMessage());
             return;
@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
                     String responseBody = response.body().string();
                     Log.d(TAG, "Translation response body: " + responseBody);
 
+                    // Modify this part to correctly parse the response
                     JSONObject jsonResponse = new JSONObject(responseBody);
-                    String translatedText = jsonResponse.getJSONObject("data")
-                            .getString("translatedText"); // Adjusted to get the correct field
+                    String translatedText = jsonResponse.getString("translated_text"); // Corrected to directly get "translated_text"
 
                     Log.d(TAG, "Translated text: " + translatedText);
                 } catch (Exception e) {
