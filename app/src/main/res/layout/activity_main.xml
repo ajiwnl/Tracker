@@ -24,7 +24,7 @@
        android:text="Analyze"
        app:layout_constraintEnd_toEndOf="parent"
        app:layout_constraintStart_toStartOf="parent"
-       app:layout_constraintBottom_toTopOf="@id/resetButton" /> <!-- Updated constraint -->
+       app:layout_constraintBottom_toTopOf="@id/resetButton" />
 
    <Button
        android:id="@+id/resetButton"
@@ -46,6 +46,5 @@
        app:layout_constraintStart_toStartOf="parent"
        app:layout_constraintEnd_toEndOf="parent" />
 
-   <!--asdasdas-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

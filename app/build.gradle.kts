@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.araneta.mood_tracker"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -40,6 +40,8 @@ dependencies {
     implementation ("org.tensorflow:tensorflow-lite:2.14.0")
     implementation ("com.google.code.gson:gson:2.10.1")
     implementation ("org.tensorflow:tensorflow-lite-task-text:0.3.0")
+    implementation ("com.android.volley:volley:1.2.1")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
