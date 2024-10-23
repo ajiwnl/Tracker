@@ -8,10 +8,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,6 +21,8 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
+    private EditText inputText;
+    private TextView resultView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +32,25 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
 
         Button analyzeButton = findViewById(R.id.analyzeButton);
-        EditText inputText = findViewById(R.id.inputTxt);
-        TextView resultView = findViewById(R.id.resultTxt);
+        Button resetButton = findViewById(R.id.resetButton);
+        inputText = findViewById(R.id.inputTxt);
+        resultView = findViewById(R.id.resultTxt);
 
         analyzeButton.setOnClickListener(view -> {
             String textToAnalyze = inputText.getText().toString();
             if (!textToAnalyze.isEmpty()) {
                 makeApiRequest(textToAnalyze, resultView);
+                // Disable the EditText after analyzing
+                inputText.setEnabled(false);
             }
+        });
+
+        resetButton.setOnClickListener(view -> {
+            // Clear input text and results
+            inputText.setText("");
+            resultView.setText("");
+            // Enable the EditText again
+            inputText.setEnabled(true);
         });
     }
 
