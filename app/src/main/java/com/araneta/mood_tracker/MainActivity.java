@@ -1,7 +1,7 @@
 package com.araneta.mood_tracker;
 
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -10,19 +10,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private EditText inputText;
     private TextView resultView;
+    private PieChart pieChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         requestQueue = Volley.newRequestQueue(this);
+        pieChart = findViewById(R.id.pieChart);
 
         Button analyzeButton = findViewById(R.id.analyzeButton);
         Button resetButton = findViewById(R.id.resetButton);
@@ -40,22 +46,20 @@ public class MainActivity extends AppCompatActivity {
             String textToAnalyze = inputText.getText().toString();
             if (!textToAnalyze.isEmpty()) {
                 makeApiRequest(textToAnalyze, resultView);
-                // Disable the EditText after analyzing
                 inputText.setEnabled(false);
             }
         });
 
         resetButton.setOnClickListener(view -> {
-            // Clear input text and results
             inputText.setText("");
             resultView.setText("");
-            // Enable the EditText again
             inputText.setEnabled(true);
+            pieChart.clear(); // Clear the chart when reset
         });
     }
 
     private void makeApiRequest(String textToAnalyze, TextView resultView) {
-        String url = "http://192.168.1.9:5000/predict";
+        String url = "http://192.168.1.5:5000/predict";
 
         JSONObject jsonBody = new JSONObject();
         try {
@@ -68,27 +72,40 @@ public class MainActivity extends AppCompatActivity {
                 Request.Method.POST, url, jsonBody,
                 response -> {
                     try {
-                        String emotion = response.getString("predicted_emotion");
-                        resultView.setText("Predicted Emotion: " + emotion);
+                        // Extract the predicted emotion
+                        String predictedEmotion = response.getString("predicted_emotion");
+                        resultView.setText("Predicted Emotion: " + predictedEmotion);
 
                         // Get the top 4 emotions with probabilities
                         JSONArray top4Emotions = response.getJSONArray("top_4_emotions");
-                        StringBuilder topEmotionsText = new StringBuilder("Top 4 Emotions:\n");
+                        ArrayList<PieEntry> entries = new ArrayList<>();
+
                         for (int i = 0; i < top4Emotions.length(); i++) {
                             JSONObject emotionObj = top4Emotions.getJSONObject(i);
                             String emotionName = emotionObj.getString("emotion");
-                            String probability = emotionObj.getString("probability");
-                            topEmotionsText.append(emotionName).append(": ").append(probability).append("\n");
+                            float probability = (float) emotionObj.getDouble("probability");
+
+                            // Highlight the predicted emotion in the label
+                            if (emotionName.equals(predictedEmotion)) {
+                                entries.add(new PieEntry(probability, emotionName + " (Predicted)"));
+                            } else {
+                                entries.add(new PieEntry(probability, emotionName));
+                            }
                         }
-                        resultView.append("\n" + topEmotionsText.toString());
+
+                        // Create and style the dataset
+                        PieDataSet dataSet = new PieDataSet(entries, "Top 4 Emotions");
+                        dataSet.setColors(new int[]{Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW});
+                        PieData pieData = new PieData(dataSet);
+
+                        pieChart.setData(pieData);
+                        pieChart.getDescription().setEnabled(false);
+                        pieChart.invalidate(); // Refresh the chart
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 },
-                error -> {
-                    // Handle errors here
-                    error.printStackTrace();
-                }
+                error -> error.printStackTrace()
         );
 
         requestQueue.add(jsonObjectRequest);

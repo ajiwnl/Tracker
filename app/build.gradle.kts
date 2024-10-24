@@ -41,6 +41,7 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.10.1")
     implementation ("org.tensorflow:tensorflow-lite-task-text:0.3.0")
     implementation ("com.android.volley:volley:1.2.1")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
